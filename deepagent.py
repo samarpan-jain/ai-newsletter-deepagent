@@ -1,4 +1,3 @@
-import argparse
 import asyncio
 import json
 import re
@@ -109,17 +108,8 @@ def _create_editor(
     )
 
 
-def _resolve_topics(
-    topics: Sequence[TopicRequest] | None,
-) -> list[TopicRequest]:
-    requests = list(
-        topics
-        if topics is not None
-        else [
-            TopicRequest(topic=topic, query=query)
-            for topic, query in DEFAULT_TOPIC_QUERIES
-        ]
-    )
+def _resolve_topics() -> list[TopicRequest]:
+    requests =[TopicRequest(topic=topic, query=query) for topic, query in DEFAULT_TOPIC_QUERIES]
     if not requests:
         raise RuntimeError("At least one newsletter topic is required.")
     if len({request.topic for request in requests}) != len(requests):
@@ -131,10 +121,8 @@ def _resolve_topics(
     return requests
 
 
-async def run_newsletter_editor(
-    topics: Sequence[TopicRequest] | None = None,
-) -> str:
-    topic_requests = _resolve_topics(topics)
+async def run_newsletter_editor() -> str:
+    topic_requests = _resolve_topics()
 
     research_store: dict[str, TopicResearch] = {}
     editor = _create_editor(topic_requests, research_store)
@@ -211,11 +199,9 @@ def _validate_html(html_text: str, topics: Sequence[TopicRequest]) -> None:
         )
 
 
-async def generate_newsletter(
-    topics: Sequence[TopicRequest] | None = None,
-) -> tuple[str, str]:
-    topic_requests = _resolve_topics(topics)
-    markdown_text = await run_newsletter_editor(topic_requests)
+async def generate_newsletter() -> tuple[str, str]:
+    topic_requests = _resolve_topics()
+    markdown_text = await run_newsletter_editor()
     html_text = markdown_to_html.invoke({"markdown_text": markdown_text})
     if not isinstance(html_text, str):
         raise RuntimeError("The markdown_to_html tool returned non-text output.")
@@ -223,8 +209,8 @@ async def generate_newsletter(
     return markdown_text, html_text
 
 
-async def _run(topics: Sequence[TopicRequest] | None = None) -> None:
-    markdown_text, html_text = await generate_newsletter(topics)
+async def _run() -> None:
+    markdown_text, html_text = await generate_newsletter()
     output_dir = Path(__file__).resolve().parent / "newsLetters"
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "newsletter.md").write_text(markdown_text, encoding="utf-8")
@@ -234,20 +220,8 @@ async def _run(topics: Sequence[TopicRequest] | None = None) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Generate an AI news newsletter.")
-    parser.add_argument(
-        "--topic",
-        action="append",
-        help="Add a research topic. May be specified more than once.",
-    )
-    args = parser.parse_args()
-    topics = (
-        [TopicRequest(topic=topic, query=topic) for topic in args.topic]
-        if args.topic
-        else None
-    )
     try:
-        asyncio.run(_run(topics))
+        asyncio.run(_run())
     except RuntimeError as error:
         print(f"Newsletter generation failed: {error}", file=sys.stderr)
         raise SystemExit(1) from None
