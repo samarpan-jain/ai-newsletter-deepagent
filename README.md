@@ -15,8 +15,7 @@ provider's request limits.
 1. Install the project dependencies with `uv sync`.
 2. Set `NEWS_API_KEY` in `.env` for GNews search.
 3. Install and start the selected model with `ollama pull qwen3:8b`.
-4. Run `uv run python deepagent.py`, or specify topics with
-   `uv run python deepagent.py --topic "AI in healthcare" --topic "AI robotics"`.
+4. Run `uv run python deepagent.py`
 
 The generated Markdown and HTML are written to `newsLetters/`. If the editor
 does not run all of its research tasks and Markdown tool, generation fails
