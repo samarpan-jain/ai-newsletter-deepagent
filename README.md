@@ -6,8 +6,7 @@ return, the editor calls a Markdown-generation tool that builds the newsletter
 from their captured search results. Search results remain the source of truth
 for headlines, descriptions, dates, and links.
 
-The default topics are AI advancements and AI layoffs. You can pass other
-topics with repeated `--topic` options. Search results are limited to the
+The default topics are AI advancements and AI layoffs. Search results are limited to the
 previous 30 days, and concurrent requests are rate-limited to respect the
 provider's request limits.
 
